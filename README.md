@@ -7,10 +7,10 @@ Repositorio académico que documenta un flujo completo de analítica sobre el pr
 El orden de ejecución y de presentación del contenido es el siguiente.
 
 1. **Calidad de datos**  
-   En el notebook `practica_parte_calidad.ipynb` se explora el conjunto de datos, se perfilan variables y se documentan criterios de limpieza y preparación. Esta etapa fundamenta decisiones posteriores sobre variables predictoras, tratamiento de valores atípicos o faltantes y transformaciones coherentes con el objetivo de modelado.
+   En el notebook `notebooks/practica_parte_calidad.ipynb` se explora el conjunto de datos, se perfilan variables y se documentan criterios de limpieza y preparación. Esta etapa fundamenta decisiones posteriores sobre variables predictoras, tratamiento de valores atípicos o faltantes y transformaciones coherentes con el objetivo de modelado.
 
 2. **Minería de datos**  
-   El notebook `practica_parte_mineria.ipynb` continúa con el entrenamiento y la comparación de modelos de regresión para predecir `lastSoldPrice`. Incluye la definición del problema, partición de datos, ingeniería de características alineada con la fase de calidad (por ejemplo, codificación del código postal) y métricas de desempeño.
+   El notebook `notebooks/practica_parte_mineria.ipynb` continúa con el entrenamiento y la comparación de modelos de regresión para predecir `lastSoldPrice`. Incluye la definición del problema, partición de datos, ingeniería de características alineada con la fase de calidad (por ejemplo, codificación del código postal) y métricas de desempeño.
 
 3. **Despliegue**  
    La aplicación `app.py` (Streamlit) carga los artefactos entrenados (`modelo.pkl`, `zip_encoder.pkl`) y expone una interfaz para introducir atributos de una vivienda y obtener una estimación de precio, replicando la preparación de datos utilizada en entrenamiento.
@@ -30,12 +30,16 @@ El orden de ejecución y de presentación del contenido es el siguiente.
 
 | Ruta | Descripción |
 |------|-------------|
-| `practica_parte_calidad.ipynb` | Análisis y reporte de calidad de datos |
-| `practica_parte_mineria.ipynb` | Modelado, evaluación y exportación del modelo |
+| `notebooks/practica_parte_calidad.ipynb` | Análisis y reporte de calidad de datos |
+| `notebooks/practica_parte_mineria.ipynb` | Modelado, evaluación y exportación del modelo |
 | `app.py` | Aplicación Streamlit para inferencia |
 | `modelo.pkl` | Modelo serializado (Random Forest y escalador asociado) |
 | `zip_encoder.pkl` | Codificador del código postal compatible con el entrenamiento |
 | `requirements.txt` | Dependencias de Python para `app.py` |
+
+Los notebooks leen y escriben artefactos en la **raíz del repositorio** (por ejemplo `datos_limpios_arizona.csv`, `zip_encoder.pkl`, `modelo.pkl`) mediante rutas relativas `../…`, de modo que la aplicación en raíz sigue encontrando los mismos ficheros.
+
+Si utilizas el CSV crudo de Kaggle, colócalo en la raíz del proyecto con el nombre `arizona_sold_properties_2026.csv` antes de ejecutar el notebook de calidad.
 
 ## Entorno y ejecución local
 
