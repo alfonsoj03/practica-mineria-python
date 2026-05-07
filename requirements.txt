@@ -1,5 +1,8 @@
 # Dependencias para la aplicación Streamlit (app.py).
 # scikit-learn debe coincidir con la versión usada al serializar modelo.pkl y el escalador.
+#
+# Streamlit Community Cloud: en el despliegue, Configuración → Versión de Python → 3.12
+# (evitar 3.14 u otras muy nuevas: sin ruedas para sklearn, la instalación puede durar horas o fallar).
 streamlit>=1.28.0
 pandas>=2.0.0
 numpy>=1.24.0
