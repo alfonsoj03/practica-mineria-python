@@ -52,10 +52,16 @@ def main() -> None:
     baths_full = st.slider("Baños completos (baths_full)", min_value=0, max_value=20, value=1, step=1)
     garage = st.slider("Plazas de garaje (garage)", min_value=0, max_value=20, value=1, step=1)
 
-    zips_posibles = encoder.ordinal_encoder.mapping[0]["mapping"].index.tolist()
-    zips_posibles = [z for z in zips_posibles if pd.notna(z) and z not in (-1, -2)]
+    raw_zips = encoder.ordinal_encoder.mapping[0]["mapping"].index.tolist()
+    zips_posibles = sorted(
+        {
+            int(z)
+            for z in raw_zips
+            if pd.notna(z) and z not in (-1, -2)
+        }
+    )
 
-    zip_input = int(st.selectbox("Código postal (zip)", zips_posibles))
+    zip_input = st.selectbox("Código postal (zip)", zips_posibles)
 
     datos = [[year_built, sqft, stories, beds, baths, baths_full, garage, zip_input]]
     data = pd.DataFrame(
