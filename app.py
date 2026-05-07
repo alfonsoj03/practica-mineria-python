@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """Aplicación Streamlit: predicción del precio de venta de viviendas en Arizona.
 
 Interfaz para capturar características de una propiedad, aplicar la misma preparación
@@ -16,29 +16,43 @@ import streamlit as st
 
 BASE_DIR = Path(__file__).resolve().parent
 
+# Coincide con `datos_limpios_arizona.csv` tras calidad (sin year_built ni stories).
+PREDICTOR_COLUMNS = [
+    "sqft",
+    "beds",
+    "baths",
+    "baths_full",
+    "garage",
+    "zip_encoded",
+]
+
 
 @st.cache_resource
 def load_artifacts():
-    """Carga modelo, escalador y codificador de ZIP desde el directorio de la aplicación."""
+    """Carga modelo, lista de variables, escalador y codificador de ZIP."""
     with open(BASE_DIR / "modelo.pkl", "rb") as f:
-        modelo, _variables, min_max_scaler = pickle.load(f)
+        modelo, variables, min_max_scaler = pickle.load(f)
     with open(BASE_DIR / "zip_encoder.pkl", "rb") as f:
         encoder = pickle.load(f)
-    return modelo, min_max_scaler, encoder
+    return modelo, variables, min_max_scaler, encoder
 
 
 def main() -> None:
     st.title("Predicción de precio de venta — Arizona")
 
-    modelo, min_max_scaler, encoder = load_artifacts()
+    modelo, variables, min_max_scaler, encoder = load_artifacts()
 
-    year_built = st.slider(
-        "Año de construcción (year_built)",
-        min_value=1850,
-        max_value=2026,
-        value=1990,
-        step=1,
-    )
+    vars_entrenamiento = [str(v) for v in variables]
+    if vars_entrenamiento != PREDICTOR_COLUMNS:
+        st.error(
+            "Los artefactos `modelo.pkl` no coinciden con el pipeline actual del dataset.\n\n"
+            f"**Esperado (tras limpieza):** `{PREDICTOR_COLUMNS}`\n\n"
+            f"**En el pickle:** `{vars_entrenamiento}`\n\n"
+            "Exporta `datos_limpios_arizona.csv` desde el notebook de calidad, ejecuta el "
+            "notebook de minería hasta guardar `modelo.pkl` y vuelve a desplegar."
+        )
+        st.stop()
+
     sqft = st.slider(
         "Superficie (sqft)",
         min_value=150,
@@ -46,7 +60,6 @@ def main() -> None:
         value=300,
         step=1,
     )
-    stories = st.slider("Niveles (stories)", min_value=1, max_value=4, value=1, step=1)
     beds = st.slider("Habitaciones (beds)", min_value=1, max_value=12, value=1, step=1)
     baths = st.slider("Baños (baths)", min_value=0, max_value=20, value=1, step=1)
     baths_full = st.slider("Baños completos (baths_full)", min_value=0, max_value=20, value=1, step=1)
@@ -63,13 +76,11 @@ def main() -> None:
 
     zip_input = st.selectbox("Código postal (zip)", zips_posibles)
 
-    datos = [[year_built, sqft, stories, beds, baths, baths_full, garage, zip_input]]
+    datos = [[sqft, beds, baths, baths_full, garage, zip_input]]
     data = pd.DataFrame(
         datos,
         columns=[
-            "year_built",
             "sqft",
-            "stories",
             "beds",
             "baths",
             "baths_full",
@@ -82,18 +93,9 @@ def main() -> None:
     data_preparada["zip_encoded"] = encoder.transform(data_preparada[["zip"]])["zip"]
     data_preparada.drop(columns=["zip"], inplace=True)
 
-    columnas_a_escalar = [
-        "year_built",
-        "sqft",
-        "stories",
-        "beds",
-        "baths",
-        "baths_full",
-        "garage",
-        "zip_encoded",
-    ]
-    data_preparada[columnas_a_escalar] = min_max_scaler.transform(
-        data_preparada[columnas_a_escalar]
+    data_preparada = data_preparada[PREDICTOR_COLUMNS]
+    data_preparada[PREDICTOR_COLUMNS] = min_max_scaler.transform(
+        data_preparada[PREDICTOR_COLUMNS]
     )
 
     prediccion_numerica = modelo.predict(data_preparada)
@@ -117,3 +119,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+

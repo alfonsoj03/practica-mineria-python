@@ -19,7 +19,7 @@ El orden de ejecución y de presentación del contenido es el siguiente.
 
 - **Objetivo:** regresión del precio de venta (`lastSoldPrice`) de propiedades residenciales en Arizona.  
 - **Origen de los datos:** conjunto público en Kaggle denominado *Arizona Real Estate: Sold Properties Dataset 2026*, con transacciones residenciales cerradas y variables estructurales (superficie, habitaciones, baños, garaje, ubicación mediante código postal, entre otras).  
-- **Variables de entrada en la aplicación:** `year_built`, `sqft`, `stories`, `beds`, `baths`, `baths_full`, `garage` y `zip` (codificado de forma consistente con el pipeline de calidad y minería).
+- **Variables de entrada en la aplicación:** `sqft`, `beds`, `baths`, `baths_full`, `garage` y `zip` (transformado a `zip_encoded` como en la etapa de calidad). Tras la limpieza del dataset no se usan `year_built` ni `stories`.
 
 ## Integrantes
 
@@ -64,6 +64,8 @@ Configuración habitual para desplegar este repositorio:
 4. No es obligatorio definir secretos para esta aplicación; los artefactos deben estar versionados en el repositorio o disponibles mediante el método de despliegue que elijas.
 
 Tras el despliegue, comprueba en los registros de la aplicación que las versiones instaladas coincidan razonablemente con las usadas al serializar el modelo (especialmente `scikit-learn`), para evitar advertencias o errores al cargar los objetos `pickle`.
+
+Si cambias el conjunto de variables predictoras (por ejemplo tras limpiar el CSV), vuelve a ejecutar el notebook de minería hasta la celda que guarda `modelo.pkl` en la raíz del proyecto y sube ese archivo junto con `app.py` para que coincidan las columnas del modelo y la interfaz.
 
 ## Limitaciones conocidas
 
